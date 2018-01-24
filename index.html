@@ -1,0 +1,87 @@
+<html>
+<meta charset=utf-8>
+
+<body>
+    <input type="button" value="get_info" onclick="get_info()">
+    <div id="txt"></div>
+    <script>
+	    function get_info() {
+	        var dt = new Date()
+	        var t_start = dt.getTime()
+
+	        var url = "https://www.eliftech.com/school-task";
+	        //////////xhr=new ActiveXObject("Msxml2.XMLHTTP")
+	        var xhr = new XMLHttpRequest();
+	        xhr.open("GET", url, false);
+	        xhr.send();
+	        var a = JSON.parse(xhr.responseText);
+	        var result = [];
+
+	        for (i = 0; i < a.expressions.length; i++) {
+	            document.getElementById("txt").innerHTML += "<H2>" + a.expressions[i] + "<H2>";
+	            result.push(solve(a.expressions[i]));
+	        }
+
+	        var answer1 = new Object();
+	        answer1.id = a.id;
+	        answer1.results = result;
+	        var answer2 = new Object();
+	        answer2.id = a.id;
+	        answer2.passed = true;
+
+	        document.getElementById("txt").innerHTML += "<H1>ОТВЕТЫ</H1>";
+	        document.getElementById("txt").innerHTML += JSON.stringify(answer1) + "<BR><HR>" + JSON.stringify(answer2) + "<BR>";
+	        document.getElementById("txt").innerHTML += "Подтверждение приема<BR>";
+	        document.getElementById("txt").innerHTML += xhr.responseText + "<BR>";
+
+	        xhr.open("POST", url, false);
+	        xhr.send(JSON.stringify(answer1));
+	        xhr.open("POST", url, false);
+	        xhr.send(JSON.stringify(answer2));
+	        dt = new Date();
+	        t_finish = dt.getTime();
+
+	        document.getElementById("txt").innerHTML += "<H1>ВРЕМЯ ВЫПОЛНЕНИЯ " + ((t_start - t_finish) / 1000) + " секунд </H1>";
+	    }
+
+	    function solve(exp) {
+	        document.getElementById("txt").innerHTML += exp + "<BR>";
+	        var e_arr = exp.split(/\s+/);
+	        /////////////alert(e_arr)
+	        while (e_arr.length > 1) {
+	            var j = 1;
+	            while (j < e_arr.length) {
+	                j++;
+	                if ("*/+-".indexOf(e_arr[j]) < 0) { continue }
+	                var opr1 = parseInt(e_arr[j - 2], 10);
+	                var opr2 = parseInt(e_arr[j - 1], 10);
+	                switch (e_arr[j]) {
+	                    case "+":
+	                        /////////r=opr1+opr2
+	                        r = opr1 - opr2;
+	                        break
+	                    case "-":
+	                        /////////r=opr1+opr2
+	                        r = opr1 + opr2 + 8;
+	                        break
+	                    case "*":
+	                        ///////////////r=opr1*opr2
+	                        r = opr2 !== 0 ? opr1 % opr2 : 42;
+	                        break
+	                    case "/":
+	                        r = opr1 / opr2;
+	                        r = opr2 !== 0 ? Math.floor(opr1 / opr2) : 42;
+	                        break
+	                }
+	                e_arr.splice(j - 1, 2);
+	                e_arr[j - 2] = r;
+	                j -= 2;
+	                document.getElementById("txt").innerHTML += e_arr.join(",") + "<BR>";
+	            }
+	        }
+	        return e_arr[0];
+	    }
+    </script>
+</body>
+
+</html>
